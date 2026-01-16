@@ -13,6 +13,10 @@ package ci553.happyshop.catalogue;
  * - stockQuantity: Quantity currently available in stock.
  */
 
+
+
+
+
 public class Product implements Comparable<Product> {
     private String proId;
     private String proDescription;
