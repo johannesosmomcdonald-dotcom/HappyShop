@@ -62,7 +62,7 @@ public class QuantityErrorNotifier {
 
     private String cutomerActionBuilder(){
         StringBuilder actions = new StringBuilder(" \u26A1 You can now: \n");
-        actions.append("\u2022 Add more products to the order\n");
+        actions.append("\u2022 Re-add the product to your order up to the mex amount\n");
         actions.append("\u2022 Cancel your order\n");
         actions.append("Thank you for understanding! \n");
         return  actions.toString();

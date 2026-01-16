@@ -75,7 +75,7 @@ public class CustomerModel {
 
     void addToTrolley(){
         if(theProduct!= null){
-            MakingOrganisedTrolley();
+            MakingOrganisedTrolley(); //organizes the list call here
             displayTaTrolley = ProductListFormatter.buildString(trolley); //build a String for trolley so that we can show it
         }
         else{
@@ -86,24 +86,30 @@ public class CustomerModel {
         updateView();
     }
 
-    // Code for week 2 lab
+    // This is the code for ensuring that the trolley remains organized by ID
     void MakingOrganisedTrolley(){
-        for(Product t:trolley){
-            if(t.getProductId().equals(theProduct.getProductId())){
-                t.setOrderedQuantity(t.getOrderedQuantity()+ theProduct.getOrderedQuantity());
-                return;
+        for(Product t:trolley){ //for loop that goes through the products in trolley
+            if(t.getProductId().equals(theProduct.getProductId())){ // if statement comparing ID of new item to those in the list
+                t.setOrderedQuantity(t.getOrderedQuantity()+ theProduct.getOrderedQuantity());//if true increment by 1
+                return; //end method
             }
         }
-        Product tNew= new Product(theProduct.getProductId(), theProduct.getProductDescription(), theProduct.getProductImageName(), theProduct.getUnitPrice(), theProduct.getStockQuantity());
+        Product tNew= new Product(theProduct.getProductId(), // code for adding new product to trolley
+                theProduct.getProductDescription(),
+                theProduct.getProductImageName(),
+                theProduct.getUnitPrice(),
+                theProduct.getStockQuantity());
         trolley.add(tNew);
 
         Collections.sort(trolley, Comparator.comparing(Product::getProductId));
+// code for sorting the items in the trolley using overiding
 
 
     }
+    //The checkOut method was broken up into an method that calls an serious of sub methods to make
+    //debugging and manging easier!
 
     void checkOut() throws IOException, SQLException {
-
         if(!trolley.isEmpty()){
             ValidateCheckout();
         }
@@ -166,7 +172,7 @@ public class CustomerModel {
 
 
 
-
+    // this method calls in all the validation methods
     public void ValidateCheckout() throws IOException, SQLException {
         ValidateCheckOutMinTotal();
         ArrayList<Product> TooManyOrderedProducts = databaseRW.ReduceStockTo50(trolley);
@@ -213,31 +219,31 @@ public class CustomerModel {
         }
 
     }
-
+//exception handling for less than £5
     public boolean ValidateCheckOutMinTotal() throws IOException, SQLException {
-        double totalprice = 0;
-        for(Product t:trolley){
+        double totalprice = 0; // sets total price of trolley to 0
+        for(Product t:trolley){ //loop through items in trolley
             int OrderQuantity = t.getOrderedQuantity();
-            totalprice = totalprice + t.getUnitPrice() * OrderQuantity;
+            totalprice = totalprice + t.getUnitPrice() * OrderQuantity; //calculate total trolley price
         }
-        try{
+        try{ //try catch statement
             if(totalprice < 5){
-                throw new UnderMinimumPaymentException("Less than £5");
+                throw new UnderMinimumPaymentException("Less than £5"); //throws to system
             }
         } catch (UnderMinimumPaymentException e) {
-            minPayNotifier.showRemovalMsg("Under minimum payment amount");
+            minPayNotifier.showRemovalMsg("Under minimum payment amount"); // used on pop up notifier
             return true;
 
         }
         return false;
 
     }
-
+    //method for checking quantity of products both greater than 50nand not enough stock
     public boolean ValidateQuanitity(ArrayList<Product> TooManyOrderedProducts) throws IOException, SQLException {
-        if(!TooManyOrderedProducts.isEmpty()){
-            for(Product t:TooManyOrderedProducts){
-                try{
-                    if(t.getOrderedQuantity() > 50){
+        if(!TooManyOrderedProducts.isEmpty()){ // check array list isn't empty
+            for(Product t:TooManyOrderedProducts){ // loops though list
+                try{ //first try catch
+                    if(t.getOrderedQuantity() >= 50){ // check greater than 50
                         throw new ExcessiveOrderQuantityException("Excessive order quantity");
                     }
                 }
@@ -249,10 +255,11 @@ public class CustomerModel {
                                 .append(p.getOrderedQuantity()).append("requested)")
                                 .append(" Only up to 50 allowed to be ordered\n");
                     }
+                    //build error messagefor any products greater than 50
                     theProduct = null;
                     for (Product p : TooManyOrderedProducts) {
                         trolley.remove(p);
-                    }
+                    }//removes them
 
                     displayTaTrolley = ProductListFormatter.buildString(trolley);
                     //Printing the error message
@@ -260,9 +267,9 @@ public class CustomerModel {
                     quanitityErrorNotifier.showRemovalMsg(ErrorMessage);
                     return true;
                 }
-                try{
+                try{//less than 50
                     if(t.getOrderedQuantity() < 50){
-                        throw new ExcessiveOrderQuantityException("Excessive order quantity 2");
+                        throw new ExcessiveOrderQuantityException("All ordered quantity under 50");
                     }
                 }
                 catch(ExcessiveOrderQuantityException e){
@@ -273,6 +280,7 @@ public class CustomerModel {
                                 .append(p.getStockQuantity()).append(" available, ")
                                 .append(p.getOrderedQuantity()).append(" requested)\n");
                     }
+                    //builds error message for products ordered greater than the ones in stock
                     theProduct = null;
                     // for loop that removes items from the trolley
                     for (Product p : TooManyOrderedProducts) {
