@@ -1,5 +1,7 @@
 package ci553.happyshop.catalogue;
 
+
+
 /**
  * The Product class used to hold the information about a product:
  *
